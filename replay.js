@@ -39,8 +39,14 @@ export class Replay {
 
         this.playbackTime += deltaTime;
         
+        const totalDuration = this.frames.reduce((total, frame) => total + frame.dt, 0);
+
+        if (totalDuration > 0 && this.playbackTime >= totalDuration) {
+            this.playbackTime %= totalDuration;
+        }
+        
         let cumulativeTime = 0;
-        let frameToDisplayIndex = 0;
+        let frameToDisplayIndex = 0; // Default to first frame
 
         for (let i = 0; i < this.frames.length; i++) {
             cumulativeTime += this.frames[i].dt;
@@ -48,7 +54,7 @@ export class Replay {
                 frameToDisplayIndex = i;
                 break;
             }
-            // If we are past the last frame's time, show the last frame
+             // Handle case where playbackTime is exactly totalDuration or slightly off due to float precision
             if (i === this.frames.length - 1) {
                 frameToDisplayIndex = i;
             }
